@@ -1,0 +1,6 @@
+#avisa ao Streamlit qauai ferramentas instalar
+streamlit
+pandas
+SQLAlchemy
+google-genai
+psycopg2-binary
