@@ -93,7 +93,7 @@ if st.button("Gerar Relatório Estratégico com IA"):
             """
             client = genai.Client(api_key=CHAVE_API_GEMINI)
             resposta = client.models.generate_content(
-                model="gemini-3.5-flash",
+                model="gemini-1.5-flash",
                 contents=prompt
             )
 
