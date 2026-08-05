@@ -4,3 +4,4 @@ pandas
 SQLAlchemy
 google-genai
 psycopg2-binary
+starlette<1.4.0
