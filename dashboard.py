@@ -92,26 +92,14 @@ if st.button("Gerar Relatório Estratégico com IA"):
             3. Uma recomendação estratégica clara para a diretoria.
             """
             client = genai.Client(api_key=CHAVE_API_GEMINI)
-            
-            # TÉCNICA DE FALLBACK: Lista do mais moderno ao mais antigo
-            modelos_suportados = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-8b']
-            resposta = None
-            
-            for modelo in modelos_suportados:
-                try:
-                    resposta = client.models.generate_content(
-                        model=modelo,
-                        contents=prompt
-                    )
-                    break # Se funcionou, sai do loop imediatamente!
-                except:
-                    continue # Se deu erro, ignora e tenta o próximo modelo
-            
-            if resposta:
-                st.success("Análise Estratégica Concluída!")
-                st.write(resposta.text)
-            else:
-                st.error("Erro: Nenhum dos modelos de IA está disponível para a sua chave de API neste momento.")
+            resposta = client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=prompt
+            )
+
+            # st.success cria uma caixa verde bonita com o texto final
+            st.success("Análise concluída!")
+            st.write(resposta.text)
 
         except Exception as e:
             st.error(f"Erro ao comunicar com a IA: {e}")
