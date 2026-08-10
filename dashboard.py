@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
-from google import genai
+from groq import Groq
 
 #cria uma variável para armazenar a URL de conexão com o banco de dados Supabase
 DATABASE_URL = st.secrets["DATABASE_URL"]
-CHAVE_API_GEMINI = st.secrets["CHAVE_API_GEMINI"]
+CHAVE_API_GROQ = st.secrets["CHAVE_API_GROQ"]
 
 #Config da página web do Stramlit
 st.set_page_config(
@@ -91,26 +91,23 @@ if st.button("Gerar Relatório Estratégico com IA"):
             2. Uma avaliação crítica sobre a logística e os impactos operacionais.
             3. Uma recomendação estratégica clara para a diretoria.
             """
-            client = genai.Client(api_key=CHAVE_API_GEMINI)
-            # TÉCNICA DE FALLBACK: Lista do mais moderno ao mais antigo
-            modelos_suportados = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-8b']
-            resposta = None
+            api_key = st.secrets["CHAVE_API_GROQ"]
+            client = Groq(api_key=api_key)
             
-            for modelo in modelos_suportados:
-                try:
-                    resposta = client.models.generate_content(
-                        model=modelo,
-                        contents=prompt
-                    )
-                    break # Se funcionou, sai do loop imediatamente!
-                except:
-                    continue # Se deu erro, ignora e tenta o próximo modelo
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+                model="llama3-8b-8192",
+            )
             
-            if resposta:
-                st.success("Análise Estratégica Concluída!")
-                st.write(resposta.text)
-            else:
-                st.error("Erro: Nenhum dos modelos de IA está disponível para a sua chave de API neste momento.")
-
+            resposta = chat_completion.choices[0].message.content
+            
+            st.success("Análise Estratégica Concluída!")
+            st.write(resposta)
+                
         except Exception as e:
-            st.error(f"Erro ao comunicar com a IA: {e}")
+            st.error(f"Erro detalhado na IA: {e}")

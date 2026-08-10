@@ -2,6 +2,6 @@
 streamlit
 pandas
 SQLAlchemy
-google-genai
+groq
 psycopg2-binary
 starlette<1.4.0
