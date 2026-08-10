@@ -105,9 +105,11 @@ if st.button("Gerar Relatório Estratégico com IA"):
             )
             
             resposta = chat_completion.choices[0].message.content
+
+            resposta_formatada = resposta.replace("$", "\$") #substitui o sifrão simples para evitar problemas de formatação
             
             st.success("Análise Estratégica Concluída!")
-            st.write(resposta)
+            st.write(resposta_formatada)
                 
         except Exception as e:
             st.error(f"Erro detalhado na IA: {e}")
