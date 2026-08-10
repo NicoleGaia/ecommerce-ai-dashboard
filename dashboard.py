@@ -32,6 +32,25 @@ st.markdown("Um painel gerencial automatizado com Inteligência Artificial.")
 
 st.divider() #cria linha horizontal para separar as seções
 
+#Barra lateral de FILTROS
+st.sidebar.header("Filtros")
+
+#lista de categorias disponíveis para o usuário selecionar
+categorias_disponiveis = df_faturamento['categoria'].unique().tolist()
+
+#caixa de seleção na barra lateral
+categoria_selecionada = st.sidebar.multiselect(
+    "Selecione as Categorias",
+    options=categorias_disponiveis,
+    default=categorias_disponiveis #seleciona todas as categorias por padrão
+)
+
+#Filtra os dados com base na categoria selecionada pelo usuário
+if categoria_selecionada:
+    df_faturamento_filtrado = df_faturamento[df_faturamento['categoria'].isin(categoria_selecionada)]
+else:
+    df_faturamento_filtrado = df_faturamento.iloc[0:0]
+
 #CÁLCULO E EXIBIÇÃO DE KPIS
 faturamento_global = df_faturamento["faturamento_total"].sum()
 total_pedidos_logistica = df_logistica["total_pedidos"].sum()
@@ -56,11 +75,12 @@ st.divider()
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("💰 Faturamento por Categoria (Top 10)")
-    st.bar_chart(data=df_faturamento.head(10), x="categoria", y="faturamento_total", color="#1f77b4")
+    st.subheader("💰 Faturamento por Categoria")
+    st.bar_chart(df_faturamento_filtrado.set_index('categoria')['faturamento_total'], color="#1f77b4")
+                 #data=df_faturamento.head(10), x="categoria", y="faturamento_total", color="#1f77b4"
 
 with col2:
-    st.subheader("📦 Status de Entregas")
+    st.subheader("📦 Status Global de Entregas")
     st.bar_chart(data=df_logistica, x="status_entrega", y="total_pedidos", color="#ff7f0e")
 
 #Integração com IA
@@ -72,24 +92,26 @@ if st.button("Gerar Relatório Estratégico com IA"):
     #exibe uma animação de carregamento enquanto a IA pensa
     with st.spinner("Lendo os dados e preparando o relatório..."):
         try:
-            texto_faturamento = df_faturamento.head(10).to_string(index=False)
+            texto_faturamento = df_faturamento_filtrado.head(10).to_string(index=False)
             texto_logistica = df_logistica.to_string(index=False)
 
             prompt = f"""
-            Atue como um Diretor de E-commerce. Analise estas duas tabelas:
+            Atue como um Diretor de E-commerce Sênior. O utilizador selecionou especificamente as seguintes categorias para análise: {categoria_selecionada}.
             
-            FATURAMENTO GLOBAL: R$ {faturamento_global:,.2f}
-
-            TABELA 1: Faturamento (Top 10 Categorias)
+            Analise estes dados consolidados destas categorias:
+            
+            FATURAMENTO GLOBAL DAS CATEGORIAS SELECIONADAS: R$ {df_faturamento_filtrado['faturamento_total'].sum():,.2f}
+            
+            TABELA DE FATURAMENTO:
             {texto_faturamento}
             
-            TABELA 2: Status de Entregas
+            TABELA DE LOGÍSTICA (Panorama Geral):
             {texto_logistica}
             
-            Escreva um breve relatório em tópicos apontando:
-            1. Qual a categoria mais importante para o faturamento atual e por quê.
-            2. Uma avaliação crítica sobre a logística e os impactos operacionais.
-            3. Uma recomendação estratégica clara para a diretoria.
+            Escreva um relatório executivo curto e em tópicos focado estritamente nas categorias selecionadas, apontando:
+            1. O desempenho comercial destas categorias específicas e qual se destaca mais.
+            2. Uma avaliação crítica conectando com o cenário operacional.
+            3. Uma recomendação estratégica direcionada para este grupo de produtos.
             """
             api_key = st.secrets["CHAVE_API_GROQ"]
             client = Groq(api_key=api_key)
