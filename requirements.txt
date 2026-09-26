@@ -3,5 +3,5 @@ streamlit
 pandas
 SQLAlchemy
 groq
-psycopg2-binary
+psycopg-binary
 starlette<1.4.0
